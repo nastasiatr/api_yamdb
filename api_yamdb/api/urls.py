@@ -13,32 +13,32 @@ from api.views import (UsersViewSet,
 router = DefaultRouter()
 
 router.register(
-    # Здесь будет эндпоинт пользователей
+    'users',
     UsersViewSet,
     basename='users'
 )
 router.register(
-    # Здесь будет эндпоинт категорий
+    'categories',
     CategoryViewSet,
     basename='сategories'
 )
 router.register(
-    # Здесь будет эндпоинт жанров
+    'genres',
     GenreViewSet,
     basename='genres'
 )
 router.register(
-    # Здесь будет эндпоинт произведений
+    'titles',
     TitleViewSet,
     basename='titles'
 )
 router.register(
-    # Здесь будет эндпоинт отзывов
+    r'titles/(?P<title_id>\d+)/reviews',
     ReviewViewSet,
     basename='reviews'
 )
 router.register(
-    # Здесь будет эндпоинт комментов
+    r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
     CommentViewSet,
     basename='comments'
 )

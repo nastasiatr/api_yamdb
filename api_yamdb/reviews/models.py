@@ -34,7 +34,8 @@ class User(AbstractUser):
     )
     role = models.CharField(    # Это поле для пользовательских ролей и прав доступа
         verbose_name='Роль',
-        default='user',         # Установил по умолчанию роль "user"  
+        default='user',         # Установил по умолчанию роль "user"
+        max_length=30,  
         blank=True
     )
 
@@ -108,7 +109,9 @@ class Title(models.Model):
         Category,
         related_name='category_title',
         verbose_name='Категория',
-        blank=False
+        on_delete=models.SET_NULL,
+        blank=False,
+        null=True
     )
 
     class Meta:
@@ -162,6 +165,7 @@ class Comment(models.Model):
     )
     text = models.CharField(
         verbose_name='Текст комментария',
+        max_length=400,
         blank=False
     )
     author = models.ForeignKey(
