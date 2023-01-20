@@ -6,14 +6,12 @@ class User(AbstractUser):
     username = models.CharField(        # Сюда кажется нужно прикрутить валидатор  
         verbose_name='Nickname',
         max_length=150,
-        unique=True,
-        blank=False
+        unique=True
     )
     email = models.EmailField(
         verbose_name='Email',
         max_length=254,
-        unique=True,
-        blank=False
+        unique=True
     )
     first_name = models.CharField(
         verbose_name='Имя',
@@ -34,7 +32,8 @@ class User(AbstractUser):
     )
     role = models.CharField(    # Это поле для пользовательских ролей и прав доступа
         verbose_name='Роль',
-        default='user',         # Установил по умолчанию роль "user"  
+        default='user',         # Установил по умолчанию роль "user"
+        max_length=30,  
         blank=True
     )
 
@@ -43,14 +42,12 @@ class Category(models.Model):
     name = models.CharField(
         verbose_name='Название категории',
         max_length=256,
-        unique=True,
-        blank=False
+        unique=True
     )
     slug = models.SlugField(
         verbose_name='Slug категории',
         max_length=50,
-        unique=True,
-        blank=False
+        unique=True
     )
 
     class Meta:
@@ -65,14 +62,12 @@ class Genre(models.Model):
     name = models.CharField(
         verbose_name='Название жанра',
         max_length=256,
-        unique=True,
-        blank=False
+        unique=True
     )
     slug = models.SlugField(
         verbose_name='Slug жанра',
         max_length=50,
-        unique=True,
-        blank=False
+        unique=True
     )
 
     class Meta:
@@ -86,12 +81,10 @@ class Genre(models.Model):
 class Title(models.Model):
     name = models.CharField(
         verbose_name='Название',
-        max_length=256,
-        blank=False
+        max_length=256
     )
     year = models.IntegerField(
-        verbose_name='Год выпуска',
-        blank=False
+        verbose_name='Год выпуска'
     )
     description = models.TextField(
         verbose_name='Описание',
@@ -101,14 +94,14 @@ class Title(models.Model):
     genre = models.ManyToManyField(
         Genre,
         related_name='genre_title',
-        verbose_name='Жанр',
-        blank=False
+        verbose_name='Жанр'
     )
     category = models.ForeignKey(
         Category,
         related_name='category_title',
         verbose_name='Категория',
-        blank=False
+        on_delete=models.SET_NULL,
+        null=True
     )
 
     class Meta:
@@ -127,8 +120,7 @@ class Review(models.Model):
         verbose_name='Произведение'
     )
     text = models.TextField(
-        verbose_name='Текст отзыва',
-        blank=False
+        verbose_name='Текст отзыва'
     )
     author = models.ForeignKey(
         User,
@@ -138,7 +130,6 @@ class Review(models.Model):
     )
     score = models.IntegerField(
         verbose_name='Оценка',          # Ограничить оценку в пределах [1 ... 10]
-        blank=False
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации',
@@ -162,7 +153,7 @@ class Comment(models.Model):
     )
     text = models.CharField(
         verbose_name='Текст комментария',
-        blank=False
+        max_length=400
     )
     author = models.ForeignKey(
         User,

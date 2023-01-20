@@ -10,40 +10,40 @@ from api.views import (UsersViewSet,
                        CommentViewSet)
 
 
-router = DefaultRouter()
+router_v1 = DefaultRouter()
 
-router.register(
-    # Здесь будет эндпоинт пользователей
+router_v1.register(
+    'users',
     UsersViewSet,
     basename='users'
 )
-router.register(
-    # Здесь будет эндпоинт категорий
+router_v1.register(
+    'categories',
     CategoryViewSet,
     basename='сategories'
 )
-router.register(
-    # Здесь будет эндпоинт жанров
+router_v1.register(
+    'genres',
     GenreViewSet,
     basename='genres'
 )
-router.register(
-    # Здесь будет эндпоинт произведений
+router_v1.register(
+    'titles',
     TitleViewSet,
     basename='titles'
 )
-router.register(
-    # Здесь будет эндпоинт отзывов
+router_v1.register(
+    r'titles/(?P<title_id>\d+)/reviews',
     ReviewViewSet,
     basename='reviews'
 )
-router.register(
-    # Здесь будет эндпоинт комментов
+router_v1.register(
+    r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
     CommentViewSet,
     basename='comments'
 )
 
 urlpatterns = [
-    path('v1/', include(router.urls)),
+    path('v1/', include(router_v1.urls)),
     # Здесь будет что-то с регистрацией и токенами
 ]
