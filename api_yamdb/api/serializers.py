@@ -1,3 +1,5 @@
+import datetime as dt
+
 from rest_framework import serializers
 
 from reviews.models import User, Category, Genre, Title, Review, Comment
@@ -28,9 +30,27 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleSerializer(serializers.ModelSerializer):
     # Здесь ещё будет дополняться Serializer произведений
 
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field='slug'
+    )
+    genre = serializers.SlugRelatedField(
+        queryset=Genre.objects.all(),
+        slug_field='slug',
+        many=True
+    )
+
     class Meta:
         model = Title
         fields = '__all__'
+
+    def validate_title_year(self, year):
+        now = dt.date.today().year
+        if year > now:
+            raise serializers.ValidationError(
+                'Год выпуска не может быть больше текущего!'
+            )
+        return year
 
 
 class ReviewSerializer(serializers.ModelSerializer):
