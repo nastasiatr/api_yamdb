@@ -1,12 +1,15 @@
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import viewsets, filters
 
+from api.filters import TitleFilter
 from api.serializers import (UsersSerializer,
                              CategorySerializer,
                              GenreSerializer,
                              ReviewSerializer,
-                             TitleSerializer,
+                             TitleWriteSerializer,
+                             TitleReadSerializer,
                              ReviewSerializer,
                              CommentSerializer)
 
@@ -18,6 +21,8 @@ class UsersViewSet(viewsets.ModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = UsersSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username',)
     pass
 
 
@@ -45,9 +50,13 @@ class TitleViewSet(viewsets.ModelViewSet):
     # Здесь ещё будет дополняться ViewSet произведений
 
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
-    pass
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilter
 
+    def get_serializer_class(self):
+        if self.request.method in ('POST', 'PATCH'):
+            return TitleWriteSerializer
+        return TitleReadSerializer
 
 class ReviewViewSet(viewsets.ModelViewSet):
     # Здесь ещё будет дополняться ViewSet отзывов

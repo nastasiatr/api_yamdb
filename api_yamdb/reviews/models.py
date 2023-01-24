@@ -30,10 +30,10 @@ class User(AbstractUser):
         blank=True,
         null=True
     )
-    role = models.CharField(    # Это поле для пользовательских ролей и прав доступа
+    role = models.CharField(
         verbose_name='Роль',
-        default='user',         # Установил по умолчанию роль "user"
-        max_length=30,  
+        default='user',
+        max_length=30, 
         blank=True
     )
 

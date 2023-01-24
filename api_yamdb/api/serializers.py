@@ -27,9 +27,7 @@ class GenreSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class TitleSerializer(serializers.ModelSerializer):
-    # Здесь ещё будет дополняться Serializer произведений
-
+class TitleWriteSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(),
         slug_field='slug'
@@ -51,6 +49,19 @@ class TitleSerializer(serializers.ModelSerializer):
                 'Год выпуска не может быть больше текущего!'
             )
         return year
+
+
+class TitleReadSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(
+        read_only=True,
+        many=True
+    )
+    rating = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        fields = '__all__'
+        model = Title
 
 
 class ReviewSerializer(serializers.ModelSerializer):
