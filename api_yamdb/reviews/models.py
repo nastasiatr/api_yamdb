@@ -1,9 +1,22 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.tokens import default_token_generator
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+USER = 'user'
+ADMIN = 'admin'
+MODERATOR = 'moderator'
+
+ROLE_CHOICES = [
+    (USER, USER),
+    (ADMIN, ADMIN),
+    (MODERATOR, MODERATOR),
+]
 
 
 class User(AbstractUser):
-    username = models.CharField(        # Сюда кажется нужно прикрутить валидатор  
+    username = models.CharField(
         verbose_name='Nickname',
         max_length=150,
         unique=True
@@ -30,12 +43,32 @@ class User(AbstractUser):
         blank=True,
         null=True
     )
-    role = models.CharField(    # Это поле для пользовательских ролей и прав доступа
+    role = models.CharField(  # Это поле для пользовательских ролей и прав доступа
         verbose_name='Роль',
-        default='user',         # Установил по умолчанию роль "user"
-        max_length=30,  
+        default='user',  # Установил по умолчанию роль "user"
+        max_length=30,
         blank=True
     )
+
+    @property
+    def is_user(self):
+        return self.role == USER
+
+    @property
+    def is_admin(self):
+        return self.role == ADMIN
+
+    @property
+    def is_moderator(self):
+        return self.role == MODERATOR
+
+    class Meta:
+        ordering = ('id',)
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+
+    def __str__(self):
+        return self.username
 
 
 class Category(models.Model):
@@ -129,7 +162,7 @@ class Review(models.Model):
         verbose_name='Aвтор отзыва'
     )
     score = models.IntegerField(
-        verbose_name='Оценка',          # Ограничить оценку в пределах [1 ... 10]
+        verbose_name='Оценка',  # Ограничить оценку в пределах [1 ... 10]
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации',
