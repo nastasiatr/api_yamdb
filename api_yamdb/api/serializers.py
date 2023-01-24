@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 
 from reviews.models import User, Category, Genre, Title, Review, Comment
 
@@ -44,7 +43,6 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Category
         fields = '__all__'
@@ -71,16 +69,25 @@ class TitleSerializer(serializers.ModelSerializer):
         model = Title
         fields = '__all__'
 
+    def validate_title_year(self, year):
+        now = dt.date.today().year
+        if year > now:
+            raise serializers.ValidationError(
+                'Год выпуска не может быть больше текущего!'
+            )
+        return year
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     title = serializers.SlugRelatedField(
         slug_field='name',
         read_only=True)
-    # Здесь ещё будет дополняться Serializer отзывов
+
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True
     )
+
     def validate_score(self, value):
         if 0 > value > 10:
             raise serializers.ValidationError('Оценка по 10-бальной шкале!')
@@ -106,6 +113,3 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = '__all__'
-
-
-
