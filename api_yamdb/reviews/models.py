@@ -1,8 +1,7 @@
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.tokens import default_token_generator
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 USER = 'user'
 ADMIN = 'admin'
@@ -46,7 +45,7 @@ class User(AbstractUser):
     role = models.CharField(
         verbose_name='Роль',
         default='user',
-        max_length=30, 
+        max_length=30,
         blank=True
     )
     confirmation_code = models.CharField(
@@ -156,7 +155,7 @@ class Review(models.Model):
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
-        related_name='review_title',
+        related_name='reviews',
         verbose_name='Произведение'
     )
     text = models.TextField(
@@ -165,11 +164,15 @@ class Review(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='review_author',
+        related_name='reviews',
         verbose_name='Aвтор отзыва'
     )
     score = models.IntegerField(
-        verbose_name='Оценка',
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(10)
+        ],
+        verbose_name='Оценка'
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации',
@@ -177,6 +180,11 @@ class Review(models.Model):
     )
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'title'],
+                name='unique review')
+        ]
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
 
@@ -188,7 +196,7 @@ class Comment(models.Model):
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
-        related_name='comment_review',
+        related_name='comments',
         verbose_name='Отзыв'
     )
     text = models.CharField(
@@ -198,7 +206,7 @@ class Comment(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='comment_author',
+        related_name='comments',
         verbose_name='Автор комментария'
     )
     pub_date = models.DateTimeField(

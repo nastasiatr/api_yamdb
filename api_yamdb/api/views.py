@@ -24,7 +24,7 @@ from api.serializers import (UsersSerializer,
                              NotAdminSerializer,
                              SignUpSerializer)
 from api.permissions import (AdminOnly,
-                             IsAdminUserOrReadOnly, 
+                             IsAdminUserOrReadOnly,
                              AdminModeratorAuthorPermission)
 from reviews.models import User, Category, Genre, Title, Review
 
@@ -136,6 +136,7 @@ class GenreViewSet(MixinViewSet):
     search_fields = ('name',)
     lookup_field = 'slug'
 
+
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     permission_classes = (IsAdminUserOrReadOnly,)
@@ -148,6 +149,7 @@ class TitleViewSet(viewsets.ModelViewSet):
             return TitleWriteSerializer
         return TitleReadSerializer
 
+
 class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = (AdminModeratorAuthorPermission,)
     serializer_class = ReviewSerializer
@@ -155,7 +157,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
-        return title.comments.all()
+        return title.reviews.all()
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
