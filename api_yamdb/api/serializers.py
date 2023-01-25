@@ -6,13 +6,16 @@ from reviews.models import User, Category, Genre, Title, Review, Comment
 
 
 class UsersSerializer(serializers.ModelSerializer):
-    # Здесь ещё будет дополняться Serializer пользователей
-
     class Meta:
         model = User
         fields = (
-            'username', 'email', 'first_name',
-            'last_name', 'bio', 'role')
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role'
+        )
 
 
 class GetTokenSerializer(serializers.ModelSerializer):
@@ -33,15 +36,27 @@ class NotAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'username', 'email', 'first_name',
-            'last_name', 'bio', 'role')
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role'
+        )
         read_only_fields = ('role',)
 
 
 class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('email', 'username')
+        fields = ('username', 'email')
+
+    def validate(self, data):
+        if data['username'] == 'me':
+            raise serializers.ValidationError(
+                'Имя пользователя "me" недопустимо'
+            )
+        return data
 
 
 class CategorySerializer(serializers.ModelSerializer):

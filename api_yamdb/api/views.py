@@ -1,11 +1,17 @@
 from django.core.mail import EmailMessage
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from requests import Response
 
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.response import Response
 from rest_framework import viewsets, filters, permissions, status
 
 from api.filters import TitleFilter
+from api.mixins import MixinViewSet
 from api.serializers import (UsersSerializer,
                              CategorySerializer,
                              GenreSerializer,
@@ -13,16 +19,14 @@ from api.serializers import (UsersSerializer,
                              TitleWriteSerializer,
                              TitleReadSerializer,
                              ReviewSerializer,
-                             CommentSerializer)
-from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
-
-from reviews.models import User, Category, Genre, Title, Review, Comment
-
-from .permissions import AdminOnly, IsAdminUserOrReadOnly, AdminModeratorAuthorPermission
-from .serializers import GetTokenSerializer, NotAdminSerializer, SignUpSerializer
+                             CommentSerializer,
+                             GetTokenSerializer,
+                             NotAdminSerializer,
+                             SignUpSerializer)
+from api.permissions import (AdminOnly,
+                             IsAdminUserOrReadOnly, 
+                             AdminModeratorAuthorPermission)
+from reviews.models import User, Category, Genre, Title, Review
 
 
 class UsersViewSet(viewsets.ModelViewSet):
@@ -59,8 +63,8 @@ class UsersViewSet(viewsets.ModelViewSet):
 
 class APIGetToken(APIView):
     """
-        Получение JWT-токена/ Адрес: 'v1/auth/token/'
-        """
+    Получение JWT-токена/ Адрес: 'v1/auth/token/'
+    """
 
     def post(self, request):
         serializer = GetTokenSerializer(data=request.data)
@@ -113,29 +117,29 @@ class APISignup(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
-    # permission_classes = (IsAdminOrReadOnly, )
+class CategoryViewSet(MixinViewSet):
     queryset = Category.objects.all()
     permission_classes = (IsAdminUserOrReadOnly,)
+    pagination_class = LimitOffsetPagination
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    lookup_field = 'slug'
 
 
-class GenreViewSet(viewsets.ModelViewSet):
-    # Здесь ещё будет дополняться ViewSet жанров
+class GenreViewSet(MixinViewSet):
     queryset = Genre.objects.all()
     permission_classes = (IsAdminUserOrReadOnly,)
+    pagination_class = LimitOffsetPagination
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    pass
-
+    lookup_field = 'slug'
 
 class TitleViewSet(viewsets.ModelViewSet):
-    # Здесь ещё будет дополняться ViewSet произведений
     queryset = Title.objects.all()
     permission_classes = (IsAdminUserOrReadOnly,)
+    pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
 
@@ -145,10 +149,9 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleReadSerializer
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    # Здесь ещё будет дополняться ViewSet отзывов
-    queryset = Review.objects.all()
     permission_classes = (AdminModeratorAuthorPermission,)
     serializer_class = ReviewSerializer
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
@@ -160,10 +163,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    # Здесь ещё будет дополняться ViewSet комментов
-    queryset = Comment.objects.all()
     permission_classes = (AdminModeratorAuthorPermission,)
     serializer_class = CommentSerializer
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))

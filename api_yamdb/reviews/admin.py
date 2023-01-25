@@ -10,7 +10,8 @@ class UserAdmin(admin.ModelAdmin):
         'first_name',
         'last_name',
         'bio',
-        'role'
+        'role',
+        'confirmation_code',
     )
     search_fields = ('username',)
     list_filter = ('username',)

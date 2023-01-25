@@ -9,9 +9,9 @@ ADMIN = 'admin'
 MODERATOR = 'moderator'
 
 ROLE_CHOICES = [
-    (USER, USER),
-    (ADMIN, ADMIN),
-    (MODERATOR, MODERATOR),
+    ('user', USER),
+    ('admin', ADMIN),
+    ('moderator', MODERATOR),
 ]
 
 
@@ -48,6 +48,13 @@ class User(AbstractUser):
         default='user',
         max_length=30, 
         blank=True
+    )
+    confirmation_code = models.CharField(
+        verbose_name='Код подтверждения',
+        max_length=8,
+        blank=True,
+        null=True,
+        default='00000000'
     )
 
     @property
@@ -88,7 +95,7 @@ class Category(models.Model):
         verbose_name_plural = 'Категории'
 
     def __str__(self) -> str:
-        return self.name
+        return self.slug
 
 
 class Genre(models.Model):
@@ -108,7 +115,7 @@ class Genre(models.Model):
         verbose_name_plural = 'Жанры'
 
     def __str__(self) -> str:
-        return self.name
+        return self.slug
 
 
 class Title(models.Model):
