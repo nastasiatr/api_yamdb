@@ -55,13 +55,6 @@ class SignUpSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'email')
 
-    def validate(self, data):
-        if data['username'] == 'me':
-            raise serializers.ValidationError(
-                'Имя пользователя "me" недопустимо'
-            )
-        return data
-
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
