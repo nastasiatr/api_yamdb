@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+from reviews.validator import validate_username
 
 USER = 'user'
 ADMIN = 'admin'
@@ -18,7 +19,8 @@ class User(AbstractUser):
     username = models.CharField(
         verbose_name='Nickname',
         max_length=150,
-        unique=True
+        unique=True,
+        validators=(validate_username,)
     )
     email = models.EmailField(
         verbose_name='Email',
@@ -45,6 +47,7 @@ class User(AbstractUser):
     role = models.CharField(
         verbose_name='Роль',
         default='user',
+        choices=ROLE_CHOICES,
         max_length=30,
         blank=True
     )

@@ -36,6 +36,12 @@ class UsersViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
+    http_method_names = [
+        'get',
+        'post',
+        'patch',
+        'delete'
+    ]
 
     @action(
         methods=['GET', 'PATCH'],
@@ -69,17 +75,19 @@ class APIGetToken(APIView):
     def post(self, request):
         serializer = GetTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
         try:
-            user = User.objects.get(username=data['username'])
+            user = serializer.validated_data['username']
+            code = serializer.data['confirmation_code']
         except User.DoesNotExist:
             return Response(
                 {'username': 'Пользователь с таким именем не найден!'},
                 status=status.HTTP_404_NOT_FOUND)
-        if data.get('confirmation_code') == user.confirmation_code:
+        user = get_object_or_404(User, username=user)
+        if code == user.confirmation_code:
             token = RefreshToken.for_user(user).access_token
-            return Response({'token': str(token)},
-                            status=status.HTTP_201_CREATED)
+            return Response(
+                {'token': str(token)},
+                status=status.HTTP_200_OK)
         return Response(
             {'confirmation_code': 'Ошибка! Неверный код подтверждения!'},
             status=status.HTTP_400_BAD_REQUEST)
