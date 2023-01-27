@@ -133,7 +133,8 @@ class APISignup(APIView):
         ).first()
         if user:
             self.send_email(user)
-            return Response('Мы отправили код подтверждения на вашу почту.', status=status.HTTP_200_OK)
+            return Response(
+                'Код отправлен на почту.', status=status.HTTP_200_OK)
 
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

@@ -1,11 +1,8 @@
 import datetime as dt
-from wsgiref import headers
 
-from django.db.migrations import serializer
 from django.db.models import Avg
-from requests import Response
 
-from rest_framework import serializers, status
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 
