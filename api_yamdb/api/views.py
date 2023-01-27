@@ -1,15 +1,16 @@
 from django.contrib.auth.tokens import default_token_generator
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import EmailMessage, send_mail
+from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
-from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.templatetags.rest_framework import data
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework_simplejwt.tokens import RefreshToken
+
 from rest_framework.response import Response
 from rest_framework import viewsets, filters, permissions, status
 
@@ -90,7 +91,9 @@ class APIGetToken(APIView):
         ).first()
         if user:
             send_mail(data)
-            return Response('Мы отправили код подтверждения на вашу почту.', status=status.HTTP_200_OK)
+            return Response(
+                'Код подтверждения отправлен вам на почту.',
+                status=status.HTTP_200_OK)
         serializer = GetTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:
