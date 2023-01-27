@@ -51,9 +51,15 @@ class NotAdminSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
-        fields = ('username', 'email')
+        fields = ['username', 'email']
+
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError('Username не может быть "me"')
+        return value
 
 
 class CategorySerializer(serializers.ModelSerializer):

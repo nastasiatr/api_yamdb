@@ -1,12 +1,15 @@
-from django.core.mail import EmailMessage
+from django.contrib.auth.tokens import default_token_generator
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import EmailMessage, send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
-from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.templatetags.rest_framework import data
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework.response import Response
 from rest_framework import viewsets, filters, permissions, status
 
@@ -72,7 +75,22 @@ class APIGetToken(APIView):
     Получение JWT-токена/ Адрес: 'v1/auth/token/'
     """
 
+    def send_email(user):
+        confirmation_code = default_token_generator.make_token(user)
+        subject = 'Код подтверждения'
+        message = f'{confirmation_code} - ваш код для авторизации'
+        admin_email = 'test@test.ru'
+        user_email = [user.email]
+        return send_mail(subject, message, admin_email, user_email)
+
     def post(self, request):
+        user = User.objects.filter(
+            username=request.data.get('username'),
+            email=request.data.get('email')
+        ).first()
+        if user:
+            send_mail(data)
+            return Response('Мы отправили код подтверждения на вашу почту.', status=status.HTTP_200_OK)
         serializer = GetTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:
@@ -100,29 +118,40 @@ class APISignup(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @staticmethod
-    def send_email(data):
-        email = EmailMessage(
-            subject=data['email_subject'],
-            body=data['email_body'],
-            to=[data['to_email']]
-        )
-        email.send()
+    def send_email(user):
+        confirmation_code = default_token_generator.make_token(user)
+        subject = 'Код подтверждения'
+        message = f'{confirmation_code} - ваш код для авторизации'
+        admin_email = 'test@test.ru'
+        user_email = [user.email]
+        return send_mail(subject, message, admin_email, user_email)
 
     def post(self, request):
+        user = User.objects.filter(
+            username=request.data.get('username'),
+            email=request.data.get('email')
+        ).first()
+        if user:
+            self.send_email(user)
+            return Response(
+                'Код отправлен на почту.', status=status.HTTP_200_OK)
+
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        email_body = (
-            f'Добрый день, {user.username}.'
-            f'Ваш код доступа к API: {user.confirmation_code}'
-        )
-        data = {
-            'email_body': email_body,
-            'to_email': user.email,
-            'email_subject': 'Код подтверждения доступа к API!'
-        }
-        self.send_email(data)
+        self.send_email(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+            headers=headers
+        )
 
 
 class CategoryViewSet(MixinViewSet):
