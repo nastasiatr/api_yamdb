@@ -72,9 +72,14 @@ class User(AbstractUser):
         return self.role == MODERATOR
 
     class Meta:
-        ordering = ('id',)
         verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
+        ordering = ['username']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['username', 'email'],
+                name="unique_fields"
+            ),
+        ]
 
     def __str__(self):
         return self.username

@@ -1,8 +1,11 @@
 import datetime as dt
+from wsgiref import headers
 
+from django.db.migrations import serializer
 from django.db.models import Avg
+from requests import Response
 
-from rest_framework import serializers
+from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 
@@ -51,9 +54,15 @@ class NotAdminSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
-        fields = ('username', 'email')
+        fields = ['username', 'email']
+
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError('Username не может быть "me"')
+        return value
 
 
 class CategorySerializer(serializers.ModelSerializer):
