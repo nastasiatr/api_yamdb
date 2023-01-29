@@ -2,6 +2,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+import HEAD as HEAD
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,6 +30,7 @@ INSTALLED_APPS = [
     'django_filters',
     'api',
     'reviews',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -74,7 +76,7 @@ DATABASES = {
 
 # Custom User model
 
-AUTH_USER_MODEL = 'reviews.User'
+AUTH_USER_MODEL = 'users.User'
 
 # Password validation
 
@@ -130,6 +132,7 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+<<<<<<< HEAD
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 DEFAULT_FROM_EMAIL = 'black.yamdb@example.com'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -143,3 +146,8 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 EMAIL_USE_SSL = False
+=======
+# Constants
+
+NAME_ME = 'me'
+>>>>>>> 1eb555beba5e63ce6fbb9e0e0d7b0b30ed58819c

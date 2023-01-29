@@ -1,7 +1,7 @@
-from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+<<<<<<< HEAD
 from reviews.validator import validate_username
 
 
@@ -84,6 +84,9 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+=======
+from users.models import User
+>>>>>>> 1eb555beba5e63ce6fbb9e0e0d7b0b30ed58819c
 
 
 class Category(models.Model):
@@ -131,7 +134,7 @@ class Title(models.Model):
         verbose_name='Название',
         max_length=256
     )
-    year = models.IntegerField(
+    year = models.PositiveSmallIntegerField(
         verbose_name='Год выпуска'
     )
     description = models.TextField(
@@ -176,7 +179,7 @@ class Review(models.Model):
         related_name='reviews',
         verbose_name='Aвтор отзыва'
     )
-    score = models.IntegerField(
+    score = models.PositiveSmallIntegerField(
         validators=[
             MinValueValidator(1),
             MaxValueValidator(10)
