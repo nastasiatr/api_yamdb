@@ -1,5 +1,4 @@
 from django.utils import timezone
-from django.db.models import Avg
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -50,17 +49,11 @@ class TitleReadSerializer(serializers.ModelSerializer):
         read_only=True,
         many=True
     )
-    rating = serializers.SerializerMethodField()
+    rating = serializers.IntegerField(required=False)
 
     class Meta:
         fields = '__all__'
         model = Title
-
-    def get_rating(self, obj):
-        rating = obj.reviews.aggregate(Avg('score')).get('score__avg')
-        if not rating:
-            return rating
-        return round(rating, 1)
 
 
 class ReviewSerializer(serializers.ModelSerializer):
