@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django_filters',
     'api',
     'reviews',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -73,7 +74,7 @@ DATABASES = {
 
 # Custom User model
 
-AUTH_USER_MODEL = 'reviews.User'
+AUTH_USER_MODEL = 'users.User'
 
 # Password validation
 
@@ -128,3 +129,7 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=3),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+# Constants
+
+NAME_ME = 'me'
