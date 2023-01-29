@@ -4,15 +4,10 @@ from django.db import models
 from users.validator import validate_username
 
 
-USER = 'user'
-ADMIN = 'admin'
-MODERATOR = 'moderator'
-
-ROLE_CHOICES = [
-    ('user', USER),
-    ('admin', ADMIN),
-    ('moderator', MODERATOR),
-]
+class UserRole(models.TextChoices):
+    USER = 'user', 'Пользователь'
+    MODERATOR = 'moderator', 'Модератор'
+    ADMIN = 'admin', 'Администратор'
 
 
 class User(AbstractUser):
@@ -45,9 +40,9 @@ class User(AbstractUser):
         null=True
     )
     role = models.CharField(
+        choices=UserRole.choices,
         verbose_name='Роль',
         default='user',
-        choices=ROLE_CHOICES,
         max_length=30,
         blank=True
     )
@@ -60,15 +55,15 @@ class User(AbstractUser):
 
     @property
     def is_user(self):
-        return self.role == USER
+        return self.role == UserRole.USER
 
     @property
     def is_admin(self):
-        return self.role == ADMIN
+        return self.role == UserRole.ADMIN
 
     @property
     def is_moderator(self):
-        return self.role == MODERATOR
+        return self.role == UserRole.MODERATOR
 
     class Meta:
         verbose_name = 'Пользователь'
