@@ -4,6 +4,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 from reviews.validator import validate_username
 
+
 USER = 'user'
 ADMIN = 'admin'
 MODERATOR = 'moderator'
