@@ -3,18 +3,22 @@ from django.core.management import BaseCommand
 from django.db.models import Avg
 
 from users.models import User
-from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
-
+from reviews.models import (Category,
+                            Comment,
+                            Genre,
+                            GenreTitle,
+                            Review,
+                            Title)
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
         if (Genre.objects.exists() or User.objects.exists() or Comment.objects.exists() or Review.objects.exists() or
                 Title.objects.exists() or Category.objects.exists() or GenreTitle.objects.exists()):
-            print('Перед импортированием данных нужно очистить базу данных. '
-                  'Для этого можно использовать команду "python manage.py flush"')
+            print('Перед запуском импорта, очистите базу данных. '
+                  'Используйте команду "python manage.py flush"')
             exit()
-        print("Начался импорт данных")
+        print("Процесс импорта данных запущен")
 
         for row in DictReader(open('static/data/users.csv', encoding='utf-8')):
             try:
@@ -22,15 +26,15 @@ class Command(BaseCommand):
                             bio=row['bio'], first_name=row['first_name'], last_name=row['last_name'])
                 user.save()
             except Exception as e:
-                print(f'Ошибка User в строчке {row} - {e}')
-        print("Импорт User завершен успешно")
+                print(f'Сбой! Ошибка импорта "User" в строчке {row} - {e}')
+        print('Импорт "User" завершен успешно!')
 
         for row in DictReader(open('static/data/genre.csv', encoding='utf-8')):
             try:
                 genre = Genre(id=row['id'], name=row['name'], slug=row['slug'])
                 genre.save()
             except Exception as e:
-                print(f'Ошибка Genre в строчке {row} - {e}')
+                print(f'Сбой! Ошибка импорта "Genre" в строчке {row} - {e}')
         print("Импорт Genre завершен успешно")
 
         for row in DictReader(open('static/data/category.csv', encoding='utf-8')):
@@ -38,8 +42,8 @@ class Command(BaseCommand):
                 category = Category(id=row['id'], name=row['name'], slug=row['slug'])
                 category.save()
             except Exception as e:
-                print(f'Ошибка Category в строчке {row} - {e}')
-        print("Импорт Category завершен успешно")
+                print(f'Сбой! Ошибка импорта "Category" в строчке {row} - {e}')
+        print('Импорт "Category" завершен успешно')
 
         for row in DictReader(open('static/data/titles.csv', encoding='utf-8')):
             try:
@@ -47,8 +51,8 @@ class Command(BaseCommand):
                 title = Title(id=row['id'], name=row['name'], year=row['year'], category=category)
                 title.save()
             except Exception as e:
-                print(f'Ошибка Title в строчке {row} - {e}')
-        print("Импорт Title завершен успешно")
+                print(f'Сбой! Ошибка импорта "Title" в строчке {row} - {e}')
+        print('Импорт "Title" завершен успешно')
 
         for row in DictReader(open('static/data/genre_title.csv', encoding='utf-8')):
             try:
@@ -57,8 +61,8 @@ class Command(BaseCommand):
                 genre_title = GenreTitle(id=row['id'], title=title, genre=genre)
                 genre_title.save()
             except Exception as e:
-                print(f'Ошибка GenreTitle в строчке {row} - {e}')
-        print("Импорт GenreTitle завершен успешно")
+                print(f'Сбой! Ошибка импорта "GenreTitle" в строчке {row} - {e}')
+        print('Импорт "GenreTitle" завершен успешно')
 
         for row in DictReader(open('static/data/review.csv', encoding='utf-8')):
             try:
@@ -71,8 +75,8 @@ class Command(BaseCommand):
                 title.rating = int(avg_title['score__avg'])
                 title.save()
             except Exception as e:
-                print(f'Ошибка Review в строчке {row} - {e}')
-        print("Импорт Review завершен успешно")
+                print(f'Сбой! Ошибка импорта "Review" в строчке {row} - {e}')
+        print('Импорт "Review" завершен успешно')
 
         for row in DictReader(open('static/data/comments.csv', encoding='utf-8')):
             try:
@@ -82,5 +86,5 @@ class Command(BaseCommand):
                                   author=author, pub_date=row['pub_date'])
                 comment.save()
             except Exception as e:
-                print(f'Ошибка Comment в строчке {row} - {e}')
-        print("Импорт Comment завершен успешно")
+                print(f'Сбой! Ошибка импорта "Comment" в строчке {row} - {e}')
+        print('Импорт "Comment" завершен успешно')
