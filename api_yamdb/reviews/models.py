@@ -1,7 +1,12 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
+from rest_framework import serializers
+
 
 from users.models import User
+
+from reviews.validator import validate_title_year
 
 
 class Category(models.Model):
@@ -50,7 +55,8 @@ class Title(models.Model):
         max_length=256
     )
     year = models.PositiveSmallIntegerField(
-        verbose_name='Год выпуска'
+        verbose_name='Год выпуска',
+        validators=(validate_title_year,)
     )
     description = models.TextField(
         verbose_name='Описание',
