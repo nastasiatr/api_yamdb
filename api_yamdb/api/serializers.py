@@ -34,7 +34,7 @@ class TitleWriteSerializer(serializers.ModelSerializer):
         model = Title
         fields = '__all__'
 
-    def validate_title_year(self, year):
+    def validate_title_year_1(self, year):
         now = timezone.now().year
         if year > now:
             raise serializers.ValidationError(
