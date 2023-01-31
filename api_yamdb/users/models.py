@@ -42,7 +42,7 @@ class User(AbstractUser):
     role = models.CharField(
         choices=UserRole.choices,
         verbose_name='Роль',
-        default='user',
+        default=UserRole.USER,
         max_length=30,
         blank=True
     )
